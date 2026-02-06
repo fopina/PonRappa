@@ -5,6 +5,7 @@ import preact from '@preact/preset-vite';
 export default defineConfig({
 	plugins: [preact()],
 	server: {
-		host: true, // Allow access from any host
+		host: true,
+		allowedHosts: ['all'], // Allow access from any hostname
 	},
 });
