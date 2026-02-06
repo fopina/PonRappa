@@ -117,8 +117,11 @@ The codebase demonstrates good functional programming practices with hooks, prop
 # Install dependencies
 npm install
 
-# Start development server
+# Start development server (localhost only)
 npm run dev
+
+# Start development server with LAN access
+npm run dev:lan
 
 # Build for production
 npm run build
@@ -135,3 +138,13 @@ http://localhost:5173/#m=C4,D4,E4,F4,G4
 ```
 
 Press and hold the button to play the note sequence in a loop.
+
+## Development Workflow Notes
+
+### Git Workflow
+**IMPORTANT**: Always push commits immediately after committing when working on non-main branches. The workflow should be:
+1. Make changes
+2. Commit changes
+3. Push immediately (unless on main branch)
+
+This ensures the remote branch stays in sync and other developers/tools can see your changes right away.
