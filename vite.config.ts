@@ -6,6 +6,6 @@ export default defineConfig({
 	plugins: [preact()],
 	server: {
 		host: true,
-		allowedHosts: ['all'], // Allow access from any hostname
+		allowedHosts: true, // Allow access from any hostname
 	},
 });
