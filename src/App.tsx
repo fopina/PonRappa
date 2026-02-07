@@ -112,13 +112,13 @@ function generateRandomSong(): string[] {
 function App() {
   const [notes, setNotes] = useState<string[]>(getNotesFromAnchor());
   const [isButtonPressed, setIsButtonPressed] = useState<boolean>(false);
-  const currentNoteIndex = useRef<number>(0);
+  const [currentNoteIndex, setCurrentNoteIndex] = useState<number>(0);
   const synth = useRef<WebAudioSynth>(new WebAudioSynth());
 
   useEffect(() => {
     const handleHashChange = () => {
       setNotes(getNotesFromAnchor());
-      currentNoteIndex.current = 0;
+      setCurrentNoteIndex(0);
     };
 
     window.addEventListener('hashchange', handleHashChange);
@@ -137,7 +137,7 @@ function App() {
   useEffect(() => {
     if (isButtonPressed && notes.length > 0) {
       // Play just the current note continuously
-      const note = notes[currentNoteIndex.current % notes.length];
+      const note = notes[currentNoteIndex % notes.length];
       synth.current.startNote(note);
 
       return () => {
@@ -146,14 +146,14 @@ function App() {
     } else {
       synth.current.stopNote();
     }
-  }, [isButtonPressed, notes]);
+  }, [isButtonPressed, notes, currentNoteIndex]);
 
   const handleButtonDown = (e: Event) => {
     e.preventDefault();
     if (!isButtonPressed && notes.length > 0) {
       setIsButtonPressed(true);
       // Advance to next note on each press
-      currentNoteIndex.current = (currentNoteIndex.current + 1) % notes.length;
+      setCurrentNoteIndex((prev) => (prev + 1) % notes.length);
     }
   };
 
@@ -172,6 +172,23 @@ function App() {
     window.location.hash = `#m=${randomNotes.join(',')}`;
   };
 
+  const carouselRef = useRef<HTMLDivElement>(null);
+
+  // Auto-scroll carousel to keep current note centered
+  useEffect(() => {
+    if (carouselRef.current && notes.length > 0) {
+      const noteElements = carouselRef.current.children;
+      const currentElement = noteElements[currentNoteIndex] as HTMLElement;
+      if (currentElement) {
+        currentElement.scrollIntoView({
+          behavior: 'smooth',
+          block: 'nearest',
+          inline: 'center',
+        });
+      }
+    }
+  }, [currentNoteIndex, notes]);
+
   return (
     <div
       style={{
@@ -185,6 +202,43 @@ function App() {
         touchAction: 'manipulation',
       }}
     >
+      {notes.length > 0 && (
+        <div
+          ref={carouselRef}
+          style={{
+            display: 'flex',
+            gap: '8px',
+            overflowX: 'auto',
+            padding: '16px',
+            maxWidth: '90vw',
+            scrollbarWidth: 'none',
+            msOverflowStyle: 'none',
+          }}
+        >
+          {notes.map((note, index) => (
+            <div
+              key={index}
+              style={{
+                minWidth: '60px',
+                height: '60px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderRadius: '8px',
+                fontSize: '20px',
+                fontWeight: 'bold',
+                backgroundColor: index === currentNoteIndex ? '#4CAF50' : '#e0e0e0',
+                color: index === currentNoteIndex ? 'white' : '#333',
+                transition: 'all 0.3s ease',
+                border: index === currentNoteIndex ? '3px solid #2E7D32' : '2px solid transparent',
+                boxShadow: index === currentNoteIndex ? '0 4px 8px rgba(0,0,0,0.2)' : 'none',
+              }}
+            >
+              {note}
+            </div>
+          ))}
+        </div>
+      )}
       <button
         onMouseDown={handleButtonDown}
         onMouseUp={handleButtonUp}
