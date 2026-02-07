@@ -285,6 +285,27 @@ function App() {
       >
         Generate Random Song
       </button>
+      <div
+        style={{
+          maxWidth: '400px',
+          textAlign: 'center',
+          padding: '16px',
+          fontSize: '14px',
+          color: '#666',
+          lineHeight: '1.6',
+        }}
+      >
+        <p style={{ margin: '0 0 8px 0', fontWeight: 'bold' }}>How to Use</p>
+        <p style={{ margin: '0 0 4px 0' }}>
+          Press and hold the button to play the highlighted note
+        </p>
+        <p style={{ margin: '0 0 4px 0' }}>
+          Release to advance to the next note
+        </p>
+        <p style={{ margin: '0' }}>
+          Click any note in the carousel to jump to it
+        </p>
+      </div>
     </div>
   );
 }
