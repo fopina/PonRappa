@@ -47,9 +47,12 @@ class WebAudioSynth {
 
     // ADSR envelope (simple attack and release)
     const now = this.audioContext.currentTime;
+    const attackTime = 0.05;
+    const releaseTime = 0.05;
+
     gainNode.gain.setValueAtTime(0, now);
-    gainNode.gain.linearRampToValueAtTime(0.3, now + 0.05); // Attack
-    gainNode.gain.linearRampToValueAtTime(0.2, now + duration - 0.1); // Sustain
+    gainNode.gain.linearRampToValueAtTime(0.3, now + attackTime); // Attack
+    gainNode.gain.setValueAtTime(0.3, now + duration - releaseTime); // Sustain
     gainNode.gain.linearRampToValueAtTime(0, now + duration); // Release
 
     oscillator.connect(gainNode);
@@ -127,7 +130,7 @@ function App() {
     if (isButtonPressed) {
       if (notes.length === 0) return;
       const note = notes[currentNoteIndex.current % notes.length];
-      synth.current.triggerAttackRelease(note, 0.3);
+      synth.current.triggerAttackRelease(note, 0.5);
       currentNoteIndex.current++;
 
       const interval = setInterval(() => {
@@ -136,7 +139,7 @@ function App() {
           return;
         }
         const note = notes[currentNoteIndex.current % notes.length];
-        synth.current.triggerAttackRelease(note, 0.3);
+        synth.current.triggerAttackRelease(note, 0.5);
         currentNoteIndex.current++;
       }, 500);
       return () => clearInterval(interval);
