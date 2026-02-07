@@ -166,6 +166,7 @@ function App() {
         height: '100vh',
         width: '100vw',
         gap: '16px',
+        touchAction: 'manipulation',
       }}
     >
       <button
@@ -174,7 +175,14 @@ function App() {
         onTouchStart={handleButtonDown}
         onTouchEnd={handleButtonUp}
         disabled={notes.length === 0}
-        style={{ padding: '20px 40px', fontSize: '24px' }}
+        style={{
+          padding: '20px 40px',
+          fontSize: '24px',
+          userSelect: 'none',
+          WebkitUserSelect: 'none',
+          WebkitTouchCallout: 'none',
+          WebkitTapHighlightColor: 'transparent',
+        }}
       >
         Play Notes
       </button>
