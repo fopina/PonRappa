@@ -1,13 +1,14 @@
 import { h } from 'preact';
 import { useEffect, useState, useRef } from 'preact/hooks';
-import { WebAudioSynth } from './synth';
+import { WebAudioSynth, SoundType } from './synth';
 import { getNotesFromAnchor, generateRandomSong } from './utils';
 
 function Player() {
   const [notes, setNotes] = useState<string[]>(getNotesFromAnchor());
   const [isButtonPressed, setIsButtonPressed] = useState<boolean>(false);
   const [currentNoteIndex, setCurrentNoteIndex] = useState<number>(0);
-  const synth = useRef<WebAudioSynth>(new WebAudioSynth());
+  const [soundType, setSoundType] = useState<SoundType>('trumpet');
+  const synth = useRef<WebAudioSynth>(new WebAudioSynth('trumpet'));
 
   useEffect(() => {
     const handleHashChange = () => {
@@ -82,6 +83,12 @@ function Player() {
         synth.current.stopNote();
       }
     }, 300);
+  };
+
+  const handleSoundTypeChange = (e: Event) => {
+    const newType = (e.target as HTMLSelectElement).value as SoundType;
+    setSoundType(newType);
+    synth.current.setSoundType(newType);
   };
 
   const carouselRef = useRef<HTMLDivElement>(null);
@@ -173,7 +180,7 @@ function Player() {
       >
         Play Notes
       </button>
-      <div style={{ display: 'flex', gap: '10px' }}>
+      <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center' }}>
         <button
           onClick={handleGenerateRandom}
           style={{ padding: '8px 16px', fontSize: '14px' }}
@@ -186,6 +193,23 @@ function Player() {
         >
           {notes.length > 0 ? 'Edit Song' : 'Create Song'}
         </button>
+        <select
+          value={soundType}
+          onChange={handleSoundTypeChange}
+          style={{
+            padding: '8px 12px',
+            fontSize: '14px',
+            borderRadius: '4px',
+            border: '1px solid #ccc',
+            backgroundColor: 'white',
+            cursor: 'pointer',
+          }}
+        >
+          <option value="trumpet">🎺 Trumpet</option>
+          <option value="sine">〰️ Sine</option>
+          <option value="square">⬛ Square</option>
+          <option value="sawtooth">⚡ Sawtooth</option>
+        </select>
       </div>
       <div
         style={{

@@ -10,7 +10,7 @@ function Editor() {
   const [notes, setNotes] = useState<string[]>(getNotesFromAnchor());
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
-  const synth = useRef<WebAudioSynth>(new WebAudioSynth());
+  const synth = useRef<WebAudioSynth>(new WebAudioSynth('trumpet'));
   const longPressTimer = useRef<number | null>(null);
 
   useEffect(() => {
