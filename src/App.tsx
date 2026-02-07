@@ -136,20 +136,11 @@ function App() {
 
   useEffect(() => {
     if (isButtonPressed && notes.length > 0) {
-      // Start playing the first note immediately
+      // Play just the current note continuously
       const note = notes[currentNoteIndex.current % notes.length];
       synth.current.startNote(note);
-      currentNoteIndex.current++;
-
-      // Set up interval to change notes
-      const interval = setInterval(() => {
-        const note = notes[currentNoteIndex.current % notes.length];
-        synth.current.startNote(note);
-        currentNoteIndex.current++;
-      }, 500);
 
       return () => {
-        clearInterval(interval);
         synth.current.stopNote();
       };
     } else {
@@ -157,11 +148,22 @@ function App() {
     }
   }, [isButtonPressed, notes]);
 
-  const handleButtonDown = () => {
-    setIsButtonPressed(true);
+  const handleButtonDown = (e: Event) => {
+    e.preventDefault();
+    if (!isButtonPressed && notes.length > 0) {
+      setIsButtonPressed(true);
+      // Advance to next note on each press
+      currentNoteIndex.current = (currentNoteIndex.current + 1) % notes.length;
+    }
   };
 
-  const handleButtonUp = () => {
+  const handleButtonUp = (e: Event) => {
+    e.preventDefault();
+    setIsButtonPressed(false);
+  };
+
+  const handleTouchCancel = (e: Event) => {
+    e.preventDefault();
     setIsButtonPressed(false);
   };
 
@@ -186,8 +188,10 @@ function App() {
       <button
         onMouseDown={handleButtonDown}
         onMouseUp={handleButtonUp}
+        onMouseLeave={handleButtonUp}
         onTouchStart={handleButtonDown}
         onTouchEnd={handleButtonUp}
+        onTouchCancel={handleTouchCancel}
         disabled={notes.length === 0}
         style={{
           padding: '20px 40px',
