@@ -152,19 +152,25 @@ function App() {
     e.preventDefault();
     if (!isButtonPressed && notes.length > 0) {
       setIsButtonPressed(true);
-      // Advance to next note on each press
-      setCurrentNoteIndex((prev) => (prev + 1) % notes.length);
     }
   };
 
   const handleButtonUp = (e: Event) => {
     e.preventDefault();
     setIsButtonPressed(false);
+    // Advance to next note after release
+    if (notes.length > 0) {
+      setCurrentNoteIndex((prev) => (prev + 1) % notes.length);
+    }
   };
 
   const handleTouchCancel = (e: Event) => {
     e.preventDefault();
     setIsButtonPressed(false);
+    // Advance to next note after touch cancel
+    if (notes.length > 0) {
+      setCurrentNoteIndex((prev) => (prev + 1) % notes.length);
+    }
   };
 
   const handleGenerateRandom = () => {
