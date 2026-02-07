@@ -32,7 +32,11 @@ class WebAudioSynth {
     return a4 * Math.pow(2, halfStepsFromA4 / 12);
   }
 
-  triggerAttackRelease(note: string, duration: number = 0.3): void {
+  // Start playing a note continuously
+  startNote(note: string): void {
+    // Stop any currently playing note first
+    this.stopNote();
+
     // Resume audio context if suspended (needed for browser autoplay policies)
     if (this.audioContext.state === 'suspended') {
       this.audioContext.resume();
@@ -45,34 +49,38 @@ class WebAudioSynth {
     oscillator.type = 'sine';
     oscillator.frequency.value = frequency;
 
-    // ADSR envelope (simple attack and release)
+    // Quick attack
     const now = this.audioContext.currentTime;
-    const attackTime = 0.05;
-    const releaseTime = 0.05;
-
     gainNode.gain.setValueAtTime(0, now);
-    gainNode.gain.linearRampToValueAtTime(0.3, now + attackTime); // Attack
-    gainNode.gain.setValueAtTime(0.3, now + duration - releaseTime); // Sustain
-    gainNode.gain.linearRampToValueAtTime(0, now + duration); // Release
+    gainNode.gain.linearRampToValueAtTime(0.3, now + 0.05); // 50ms attack
 
     oscillator.connect(gainNode);
     gainNode.connect(this.audioContext.destination);
 
     oscillator.start(now);
-    oscillator.stop(now + duration);
 
     this.currentOscillator = oscillator;
     this.currentGain = gainNode;
   }
 
-  dispose(): void {
-    if (this.currentOscillator) {
-      try {
-        this.currentOscillator.stop();
-      } catch (e) {
-        // Oscillator may already be stopped
-      }
+  // Stop the currently playing note
+  stopNote(): void {
+    if (this.currentOscillator && this.currentGain) {
+      const now = this.audioContext.currentTime;
+      // Quick release
+      this.currentGain.gain.cancelScheduledValues(now);
+      this.currentGain.gain.setValueAtTime(this.currentGain.gain.value, now);
+      this.currentGain.gain.linearRampToValueAtTime(0, now + 0.05); // 50ms release
+
+      // Stop the oscillator after the release
+      this.currentOscillator.stop(now + 0.05);
+      this.currentOscillator = null;
+      this.currentGain = null;
     }
+  }
+
+  dispose(): void {
+    this.stopNote();
     this.audioContext.close();
   }
 }
@@ -127,22 +135,25 @@ function App() {
   }, []);
 
   useEffect(() => {
-    if (isButtonPressed) {
-      if (notes.length === 0) return;
+    if (isButtonPressed && notes.length > 0) {
+      // Start playing the first note immediately
       const note = notes[currentNoteIndex.current % notes.length];
-      synth.current.triggerAttackRelease(note, 0.5);
+      synth.current.startNote(note);
       currentNoteIndex.current++;
 
+      // Set up interval to change notes
       const interval = setInterval(() => {
-        if (!isButtonPressed) {
-          clearInterval(interval);
-          return;
-        }
         const note = notes[currentNoteIndex.current % notes.length];
-        synth.current.triggerAttackRelease(note, 0.5);
+        synth.current.startNote(note);
         currentNoteIndex.current++;
       }, 500);
-      return () => clearInterval(interval);
+
+      return () => {
+        clearInterval(interval);
+        synth.current.stopNote();
+      };
+    } else {
+      synth.current.stopNote();
     }
   }, [isButtonPressed, notes]);
 
