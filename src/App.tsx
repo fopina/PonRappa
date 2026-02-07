@@ -172,6 +172,18 @@ function App() {
     window.location.hash = `#m=${randomNotes.join(',')}`;
   };
 
+  const handleNoteClick = (index: number) => {
+    setCurrentNoteIndex(index);
+    // Play the clicked note briefly
+    const note = notes[index];
+    synth.current.startNote(note);
+    setTimeout(() => {
+      if (!isButtonPressed) {
+        synth.current.stopNote();
+      }
+    }, 300);
+  };
+
   const carouselRef = useRef<HTMLDivElement>(null);
 
   // Auto-scroll carousel to keep current note centered
@@ -218,6 +230,7 @@ function App() {
           {notes.map((note, index) => (
             <div
               key={index}
+              onClick={() => handleNoteClick(index)}
               style={{
                 minWidth: '60px',
                 height: '60px',
@@ -232,6 +245,8 @@ function App() {
                 transition: 'all 0.3s ease',
                 border: index === currentNoteIndex ? '3px solid #2E7D32' : '2px solid transparent',
                 boxShadow: index === currentNoteIndex ? '0 4px 8px rgba(0,0,0,0.2)' : 'none',
+                cursor: 'pointer',
+                userSelect: 'none',
               }}
             >
               {note}
