@@ -62,6 +62,11 @@ main {
 	}
 }
 
+/* Hide scrollbar for carousel */
+div::-webkit-scrollbar {
+	display: none;
+}
+
 @media (prefers-color-scheme: dark) {
 	:root {
 		color: #ccc;
