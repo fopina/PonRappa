@@ -12,11 +12,11 @@
 		"preact-iso": "^2.9.1"
 	},
 	"devDependencies": {
-		"@preact/preset-vite": "^2.9.3",
+		"@preact/preset-vite": "^2.10.5",
 		"eslint": "^8.57.1",
 		"eslint-config-preact": "^1.5.0",
 		"typescript": "^5.8.2",
-		"vite": "^6.4.1"
+		"vite": "^8.0.16"
 	},
 	"eslintConfig": {
 		"extends": "preact"
